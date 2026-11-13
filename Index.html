@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flamewolf - Free Online Video Editor</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, sans-serif; background: #111; color: #fff; }
+  header { padding: 16px; text-align: center; background: #1c1c1c; border-bottom: 2px solid #ff5a1f; }
+  header h1 { margin: 0; font-size: 28px; color: #ff5a1f; }
+  header p { margin: 6px 0 0; color: #bbb; font-size: 14px; }
+  main { max-width: 900px; margin: 0 auto; padding: 16px; }
+  .btn { display: inline-block; background: #ff5a1f; color: #fff; border: 0; border-radius: 10px;
+         padding: 14px 22px; font-size: 16px; cursor: pointer; }
+  .btn:disabled { background: #555; cursor: not-allowed; }
+  #fileInput { display: none; }
+  #player { width: 100%; max-height: 60vh; background: #000; border-radius: 10px; margin-top: 16px; display: none; }
+  .row { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  #info { color: #bbb; font-size: 14px; word-break: break-all; }
+  #msg { color: #ff8a5c; margin-top: 10px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Flamewolf</h1>
+  <p>Free online video editor</p>
+</header>
+<main>
+  <label class="btn" for="fileInput">Choose a video</label>
+  <input type="file" id="fileInput" accept="video/*">
+  <div id="msg"></div>
+  <video id="player" controls playsinline></video>
+  <div class="row">
+    <button class="btn" id="playBtn" disabled>Play</button>
+    <span id="info">No video selected yet.</span>
+  </div>
+</main>
+<script>
+  var fileInput = document.getElementById('fileInput');
+  var player = document.getElementById('player');
+  var playBtn = document.getElementById('playBtn');
+  var info = document.getElementById('info');
+  var msg = document.getElementById('msg');
+  var currentUrl = null;
+
+  fileInput.addEventListener('change', function () {
+    var file = fileInput.files[0];
+    msg.textContent = '';
+    if (!file) return;
+    if (file.type.indexOf('video/') !== 0) {
+      msg.textContent = 'Please choose a video file.';
+      return;
+    }
+    if (currentUrl) URL.revokeObjectURL(currentUrl);
+    currentUrl = URL.createObjectURL(file);
+    player.src = currentUrl;
+    player.style.display = 'block';
+    player.load();
+    info.textContent = file.name + ' (' + (file.size / 1048576).toFixed(1) + ' MB)';
+  });
+
+  player.addEventListener('loadedmetadata', function () {
+    playBtn.disabled = false;
+    playBtn.textContent = 'Play';
+  });
+
+  player.addEventListener('error', function () {
+    msg.textContent = 'This video format cannot be played in your browser. Try an MP4 file.';
+    playBtn.disabled = true;
+  });
+
+  playBtn.addEventListener('click', function () {
+    if (player.paused) { player.play(); } else { player.pause(); }
+  });
+  player.addEventListener('play', function () { playBtn.textContent = 'Pause'; });
+  player.addEventListener('pause', function () { playBtn.textContent = 'Play'; });
+  player.addEventListener('ended', function () { playBtn.textContent = 'Play'; });
+</script>
+</body>
+</html>
