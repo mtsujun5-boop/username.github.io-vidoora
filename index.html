@@ -1,375 +1,299 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Framewolf - Video Editor</title>
-
+<title>Flamewolf Video Editor</title>
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  background: #101116;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-
-header {
-  height: 65px;
-  padding: 15px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #292a32;
-}
-
-.logo {
-  font-size: 23px;
-  font-weight: bold;
-  color: #a78bfa;
-}
-
-.logo span {
-  color: white;
-}
-
-main {
-  max-width: 950px;
-  margin: auto;
-  padding: 20px;
-}
-
-h2 {
-  margin-bottom: 8px;
-}
-
-.subtitle {
-  color: #999;
-  margin-bottom: 22px;
-  font-size: 14px;
-}
-
-.upload {
-  border: 2px dashed #555;
-  border-radius: 14px;
-  padding: 25px 15px;
-  text-align: center;
-  background: #191a22;
-  margin-bottom: 20px;
-}
-
-.upload p {
-  color: #aaa;
-  margin: 10px 0;
-}
-
-button, .upload-label {
-  background: #7955e9;
-  color: white;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-.upload-label {
-  display: inline-block;
-  margin-top: 8px;
-}
-
-input[type="file"] {
-  display: none;
-}
-
-.preview {
-  background: black;
-  border-radius: 12px;
-  overflow: hidden;
-  margin-bottom: 18px;
-  min-height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-video {
-  width: 100%;
-  max-height: 430px;
-  display: none;
-}
-
-.placeholder {
-  color: #777;
-  padding: 60px 10px;
-  text-align: center;
-}
-
-.controls {
-  background: #191a22;
-  padding: 18px;
-  border-radius: 12px;
-  margin-bottom: 18px;
-}
-
-.controls button {
-  margin-right: 8px;
-}
-
-.timeline {
-  margin-top: 20px;
-}
-
-.timeline input {
-  width: 100%;
-  accent-color: #a78bfa;
-  margin-top: 12px;
-}
-
-.trim {
-  display: flex;
-  gap: 12px;
-  margin-top: 18px;
-}
-
-.trim div {
-  flex: 1;
-}
-
-.trim label {
-  display: block;
-  color: #aaa;
-  font-size: 13px;
-  margin-bottom: 7px;
-}
-
-.trim input {
-  width: 100%;
-  padding: 10px;
-  background: #292a32;
-  color: white;
-  border: 1px solid #444;
-  border-radius: 7px;
-}
-
-.time {
-  color: #aaa;
-  font-size: 13px;
-  margin-top: 8px;
-}
-
-footer {
-  text-align: center;
-  color: #777;
-  padding: 25px;
-  font-size: 12px;
-}
-
-@media(max-width: 500px) {
-  main {
-    padding: 14px;
-  }
-  .trim {
-    flex-direction: column;
-  }
+*{box-sizing:border-box}
+body{margin:0;background:#101116;color:#eee;font-family:Arial,sans-serif}
+header{height:65px;background:#191a22;border-bottom:1px solid #333;display:flex;align-items:center;justify-content:space-between;padding:0 18px}
+.logo{font-size:25px;font-weight:bold;color:#ff493b}
+button,.upload{background:#282a35;color:white;border:1px solid #444;padding:10px 14px;border-radius:8px;cursor:pointer}
+button:hover,.upload:hover{background:#414451}
+main{display:grid;grid-template-columns:220px 1fr;min-height:calc(100vh - 65px)}
+aside{background:#191a22;padding:15px;border-right:1px solid #333}
+aside h3{font-size:14px;color:#aaa}
+.tool{display:block;width:100%;text-align:left;margin:7px 0}
+.workspace{padding:18px;min-width:0}
+.preview{background:#050505;border:1px solid #333;border-radius:12px;min-height:280px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+video{max-width:100%;max-height:55vh}
+#overlay{position:absolute;color:white;font-size:25px;font-weight:bold;text-shadow:2px 2px 5px black;pointer-events:none}
+.controls{display:flex;flex-wrap:wrap;gap:9px;margin:14px 0}
+.panel{background:#191a22;border:1px solid #333;border-radius:10px;padding:15px;margin-top:15px}
+.panel h3{margin-top:0}
+input[type=range]{width:100%;accent-color:#ff493b}
+input[type=text],select{background:#101116;color:white;border:1px solid #444;border-radius:7px;padding:10px;width:100%;margin:6px 0}
+label{display:block;color:#bbb;margin:10px 0 5px}
+.timeline{background:#191a22;padding:15px;border-radius:10px;margin-top:15px}
+.small{font-size:12px;color:#aaa}
+#status{color:#ffb35c;font-size:13px}
+@media(max-width:650px){
+main{grid-template-columns:1fr}
+aside{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}
+aside h3{grid-column:1/-1}
+.tool{margin:2px 0;font-size:12px;padding:9px}
+.workspace{padding:10px}
+.preview{min-height:220px}
 }
 </style>
 </head>
-
 <body>
-
 <header>
-  <div class="logo">FRAME<span>WOLF</span></div>
-  <div>✦ Editor</div>
+  <div class="logo">🔥 FLAMEWOLF</div>
+  <label class="upload">＋ Upload Video
+    <input id="file" type="file" accept="video/*" hidden>
+  </label>
 </header>
 
 <main>
+<aside>
+<h3>VIDEO TOOLS</h3>
+<button class="tool" onclick="showPanel('trim')">✂ Trim Video</button>
+<button class="tool" onclick="showPanel('filters')">🎨 Filters</button>
+<button class="tool" onclick="showPanel('speed')">⚡ Speed Control</button>
+<button class="tool" onclick="showPanel('audio')">🔊 Audio</button>
+<button class="tool" onclick="showPanel('text')">T Text & Titles</button>
+<button class="tool" onclick="showPanel('crop')">▣ Crop & Resize</button>
+<button class="tool" onclick="showPanel('export')">⬇ Export Video</button>
+<button class="tool" onclick="resetAll()">↶ Reset</button>
+<h3>MORE TOOLS</h3>
+<button class="tool" onclick="comingSoon('Split')">Split Clips</button>
+<button class="tool" onclick="comingSoon('Merge')">Merge Videos</button>
+<button class="tool" onclick="comingSoon('Subtitles')">Subtitles</button>
+<button class="tool" onclick="comingSoon('Voice Recording')">Voice Recording</button>
+<button class="tool" onclick="comingSoon('Transitions')">Transitions</button>
+</aside>
 
-<h2>Online Video Editor</h2>
-<p class="subtitle">
-Create and edit your videos. Free to start.
-</p>
-
-<div class="upload">
-  <div style="font-size:35px">🎬</div>
-  <h3>Upload Your Video</h3>
-  <p>Select a video from your device</p>
-
-  <label class="upload-label" for="file">
-    Choose Video
-  </label>
-
-  <input type="file" id="file" accept="video/*">
-</div>
-
-<div class="preview">
-  <div class="placeholder" id="placeholder">
-    Your video preview will appear here
-  </div>
-  <video id="video" controls playsinline></video>
+<section class="workspace">
+<div class="preview" id="preview">
+  <video id="video" playsinline></video>
+  <div id="overlay"></div>
+  <div id="placeholder">Upload a video to start editing</div>
 </div>
 
 <div class="controls">
-
-  <button id="play">▶ Play</button>
-  <button id="pause">⏸ Pause</button>
-
-  <div class="timeline">
-
-    <h3>Timeline</h3>
-
-    <input
-      type="range"
-      id="seek"
-      min="0"
-      max="100"
-      value="0"
-    >
-
-    <div class="time">
-      <span id="current">0:00</span>
-      /
-      <span id="duration">0:00</span>
-    </div>
-
-  </div>
-
-  <div class="trim">
-
-    <div>
-      <label>Start Time (seconds)</label>
-      <input type="number" id="start" min="0" value="0">
-    </div>
-
-    <div>
-      <label>End Time (seconds)</label>
-      <input type="number" id="end" min="0" value="0">
-    </div>
-
-  </div>
-
-  <p class="time" id="trimInfo">
-    Upload a video to set your trim range.
-  </p>
-
+<button onclick="togglePlay()">▶ / ⏸ Play</button>
+<button onclick="video.currentTime=0">↺ Restart</button>
+<button onclick="video.muted=!video.muted">🔇 Mute</button>
+<span id="time" class="small">00:00 / 00:00</span>
 </div>
 
-<footer>
-  Framewolf © 2026 — Create Without Limits
-</footer>
+<div class="timeline">
+<label>Video Timeline</label>
+<input id="seek" type="range" min="0" max="100" value="0">
+<div class="small">Drag the timeline to move through your video.</div>
+</div>
 
+<div class="panel" id="trim">
+<h3>✂ Trim Video</h3>
+<label>Start time (seconds)</label>
+<input id="start" type="number" min="0" value="0">
+<label>End time (seconds)</label>
+<input id="end" type="number" min="0" value="0">
+<button onclick="previewTrim()">Preview Trim</button>
+<button onclick="applyTrim()">Apply Trim</button>
+</div>
+
+<div class="panel" id="filters">
+<h3>🎨 Video Filters</h3>
+<select id="filter" onchange="applyFilter()">
+<option value="none">Original</option>
+<option value="grayscale(1)">Black & White</option>
+<option value="sepia(1)">Vintage</option>
+<option value="contrast(1.4) saturate(1.3)">Cinematic</option>
+<option value="brightness(1.2) saturate(1.3)">Bright</option>
+<option value="saturate(1.8)">Vibrant</option>
+<option value="contrast(1.5)">High Contrast</option>
+<option value="sepia(.35) saturate(1.4)">Warm Tone</option>
+<option value="hue-rotate(180deg)">Cool Tone</option>
+<option value="blur(1px)">Soft Focus</option>
+</select>
+</div>
+
+<div class="panel" id="speed">
+<h3>⚡ Speed Control</h3>
+<label>Playback speed</label>
+<select id="speedValue" onchange="setSpeed()">
+<option value=".25">0.25x</option>
+<option value=".5">0.5x</option>
+<option value=".75">0.75x</option>
+<option value="1" selected>1x Normal</option>
+<option value="1.5">1.5x</option>
+<option value="2">2x</option>
+</select>
+</div>
+
+<div class="panel" id="audio">
+<h3>🔊 Audio Controls</h3>
+<label>Volume</label>
+<input id="volume" type="range" min="0" max="1" step=".05" value="1" oninput="video.volume=this.value">
+<button onclick="video.muted=!video.muted">Mute / Unmute</button>
+</div>
+
+<div class="panel" id="text">
+<h3>T Text & Titles</h3>
+<input id="titleText" type="text" placeholder="Write your video title">
+<button onclick="addText()">Add Text</button>
+<button onclick="removeText()">Remove Text</button>
+</div>
+
+<div class="panel" id="crop">
+<h3>▣ Preview Size</h3>
+<select id="ratio" onchange="setRatio()">
+<option value="16 / 9">16:9 Landscape</option>
+<option value="9 / 16">9:16 Portrait</option>
+<option value="1 / 1">1:1 Square</option>
+<option value="4 / 3">4:3</option>
+</select>
+<p class="small">This changes the preview frame, not the exported video's actual dimensions.</p>
+</div>
+
+<div class="panel" id="export">
+<h3>⬇ Export Video</h3>
+<p class="small">Record the edited video in real time using your browser.</p>
+<button onclick="exportVideo()">Start Export</button>
+<p id="status">Upload a video first.</p>
+</div>
+</section>
 </main>
 
 <script>
-const file = document.getElementById("file");
-const video = document.getElementById("video");
-const placeholder = document.getElementById("placeholder");
+const video=document.getElementById('video');
+const file=document.getElementById('file');
+const seek=document.getElementById('seek');
+const timeLabel=document.getElementById('time');
+const placeholder=document.getElementById('placeholder');
+let videoURL=null;
+let trimTimer=null;
+let recorder=null;
+let chunks=[];
 
-const play = document.getElementById("play");
-const pause = document.getElementById("pause");
+file.addEventListener('change',()=>{
+ const f=file.files[0];
+ if(!f)return;
+ if(videoURL)URL.revokeObjectURL(videoURL);
+ videoURL=URL.createObjectURL(f);
+ video.src=videoURL;
+ video.load();
+ placeholder.style.display='none';
+ document.getElementById('status').textContent='Video ready.';
+});
 
-const seek = document.getElementById("seek");
-const current = document.getElementById("current");
-const duration = document.getElementById("duration");
+video.addEventListener('loadedmetadata',()=>{
+ document.getElementById('end').value=video.duration.toFixed(2);
+ updateTime();
+});
+video.addEventListener('timeupdate',()=>{
+ if(video.duration){
+ seek.value=(video.currentTime/video.duration)*100;
+ updateTime();
+ }
+ if(trimTimer!==null && video.currentTime>=trimTimer){
+ video.pause();
+ trimTimer=null;
+ }
+});
+seek.addEventListener('input',()=>{
+ if(video.duration)video.currentTime=(seek.value/100)*video.duration;
+});
 
-const start = document.getElementById("start");
-const end = document.getElementById("end");
-const trimInfo = document.getElementById("trimInfo");
-
-let videoURL = null;
-
-function formatTime(seconds) {
-  if (!Number.isFinite(seconds)) return "0:00";
-
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-
-  return mins + ":" + String(secs).padStart(2, "0");
+function updateTime(){
+ timeLabel.textContent=format(video.currentTime)+' / '+format(video.duration||0);
+}
+function format(s){
+ if(!isFinite(s))return '00:00';
+ return String(Math.floor(s/60)).padStart(2,'0')+':'+String(Math.floor(s%60)).padStart(2,'0');
+}
+function togglePlay(){
+ if(!video.src)return alert('Please upload a video first.');
+ if(video.paused)video.play();else video.pause();
+}
+function showPanel(id){
+ document.getElementById(id).scrollIntoView({behavior:'smooth'});
+}
+function previewTrim(){
+ if(!video.src)return alert('Upload a video first.');
+ const s=Number(document.getElementById('start').value);
+ const e=Number(document.getElementById('end').value);
+ if(s<0||e<=s||e>video.duration)return alert('Enter valid start and end times.');
+ video.currentTime=s;
+ trimTimer=e;
+ video.play();
+}
+function applyTrim(){
+ previewTrim();
+}
+function applyFilter(){
+ video.style.filter=document.getElementById('filter').value;
+}
+function setSpeed(){
+ video.playbackRate=Number(document.getElementById('speedValue').value);
+}
+function addText(){
+ document.getElementById('overlay').textContent=document.getElementById('titleText').value;
+}
+function removeText(){
+ document.getElementById('overlay').textContent='';
+}
+function setRatio(){
+ document.getElementById('preview').style.aspectRatio=document.getElementById('ratio').value;
+}
+function resetAll(){
+ video.pause();
+ video.currentTime=0;
+ video.playbackRate=1;
+ video.volume=1;
+ video.muted=false;
+ video.style.filter='none';
+ document.getElementById('filter').value='none';
+ document.getElementById('speedValue').value='1';
+ document.getElementById('volume').value='1';
+ removeText();
+ trimTimer=null;
+}
+function comingSoon(name){
+ alert(name+' tool is planned for a future update.');
 }
 
-file.addEventListener("change", () => {
-  const selected = file.files[0];
-
-  if (!selected) return;
-
-  if (videoURL) {
-    URL.revokeObjectURL(videoURL);
-  }
-
-  videoURL = URL.createObjectURL(selected);
-
-  video.src = videoURL;
-  video.style.display = "block";
-  placeholder.style.display = "none";
-
-  video.load();
-});
-
-video.addEventListener("loadedmetadata", () => {
-  seek.max = video.duration;
-
-  duration.textContent = formatTime(video.duration);
-
-  start.value = 0;
-  end.value = video.duration.toFixed(1);
-
-  start.max = video.duration;
-  end.max = video.duration;
-
-  trimInfo.textContent =
-    "Selected range: 0 to " +
-    video.duration.toFixed(1) + " seconds";
-});
-
-play.addEventListener("click", () => {
-  video.play();
-});
-
-pause.addEventListener("click", () => {
-  video.pause();
-});
-
-video.addEventListener("timeupdate", () => {
-  seek.value = video.currentTime;
-  current.textContent = formatTime(video.currentTime);
-});
-
-seek.addEventListener("input", () => {
-  video.currentTime = Number(seek.value);
-});
-
-function updateTrim() {
-  if (!Number.isFinite(video.duration)) return;
-
-  let from = Number(start.value);
-  let to = Number(end.value);
-
-  from = Math.max(0, Math.min(from, video.duration));
-  to = Math.max(0, Math.min(to, video.duration));
-
-  if (from > to) {
-    to = from;
-    end.value = to;
-  }
-
-  start.value = from;
-  end.value = to;
-
-  trimInfo.textContent =
-    "Selected range: " +
-    from.toFixed(1) + " to " +
-    to.toFixed(1) + " seconds";
+async function exportVideo(){
+ if(!video.src)return alert('Upload a video first.');
+ if(!video.captureStream && !video.mozCaptureStream){
+ return alert('Your browser does not support video recording export.');
+ }
+ const stream=(video.captureStream||video.mozCaptureStream).call(video);
+ const types=['video/webm;codecs=vp9','video/webm;codecs=vp8','video/webm'];
+ const mime=types.find(t=>MediaRecorder.isTypeSupported(t));
+ if(!mime)return alert('Recording format is not supported in this browser.');
+ chunks=[];
+ try{
+ recorder=new MediaRecorder(stream,{mimeType:mime});
+ recorder.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};
+ recorder.onstop=()=>{
+  const blob=new Blob(chunks,{type:mime});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download='flamewolf-video.webm';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+  document.getElementById('status').textContent='Export finished. File downloaded.';
+ };
+ recorder.start();
+ video.currentTime=Number(document.getElementById('start').value)||0;
+ trimTimer=Number(document.getElementById('end').value)||video.duration;
+ document.getElementById('status').textContent='Recording export... Keep this tab open.';
+ await video.play();
+ }catch(err){
+ document.getElementById('status').textContent='Export failed: '+err.message;
+ }
 }
-
-start.addEventListener("change", updateTrim);
-end.addEventListener("change", updateTrim);
-
+video.addEventListener('pause',()=>{
+ if(recorder && recorder.state==='recording'){
+  recorder.stop();
+  trimTimer=null;
+ }
+});
 </script>
-
 </body>
 </html>
